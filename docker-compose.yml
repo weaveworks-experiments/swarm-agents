@@ -1,0 +1,90 @@
+version: "3.3"
+
+networks:
+  net:
+    driver: overlay
+    attachable: true
+
+configs:
+  prom_config:
+    file: ./prometheus/weave-cortex.yml
+  prom_entrypoint:
+    file: ./prometheus/docker-entrypoint.sh
+  node_entrypoint:
+    file: ./node-exporter/docker-entrypoint.sh
+
+services:
+  cadvisor:
+    image: google/cadvisor:v0.27.2
+    networks:
+      - net
+    command: -logtostderr -docker_only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+
+  node-exporter:
+    image: prom/node-exporter:v0.14.0
+    configs:
+      - source: node_entrypoint
+        target: /etc/node-exporter/docker-entrypoint.sh
+        mode: 0550
+    entrypoint:
+      - '/etc/node-exporter/docker-entrypoint.sh'
+    networks:
+      - net
+    environment:
+      - NODE_ID={{.Node.ID}}
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename
+    command:
+      - '-collector.textfile.directory=/etc/node-exporter/'
+      - '-collector.procfs=/host/proc'
+      - '-collector.sysfs=/host/sys'
+      - '-collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '-collectors.enabled=textfile,conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,time,vmstat'
+    deploy:
+      mode: global
+
+  prometheus:
+    image: prom/prometheus:v1.8.2
+    configs:
+      - source: prom_entrypoint
+        target: /etc/prometheus/docker-entrypoint.sh
+        mode: 0550
+      - source: prom_config
+        target: /etc/prometheus/weave-cortex.yml
+    entrypoint:
+      - '/etc/prometheus/docker-entrypoint.sh'
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+      - '-storage.local.path=/prometheus'
+      - '-storage.local.retention=1h'
+    environment:
+      - WEAVE_TOKEN=$TOKEN
+    networks:
+      - net
+    deploy:
+      placement:
+        constraints:
+          - 'node.role != manager'
+
+  scope-launcher:
+    image: weaveworks/scope-swarm-launcher
+    networks:
+      - net
+    command: scope launch --service-token=$TOKEN
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+      restart_policy:
+        condition: none
