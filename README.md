@@ -3,7 +3,7 @@
 Prerequisites:
 
 * Docker 17.09.0-ce or 17.06.2-ee-3
-* Docker Swarm cluster with one manager and a worker node
+* Docker Swarm cluster with at least one manager and a worker node
 
 Install:
 
