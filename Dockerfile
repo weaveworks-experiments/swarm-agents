@@ -14,6 +14,8 @@ RUN apk add --update curl bash \
   && chmod +x /usr/local/bin/docker \
   && rm -rf docker docker.tgz \
   && chmod +x /usr/local/bin/docker \
-  && chmod +x /usr/local/bin/install
+  && chmod +x /usr/local/bin/install \
+  && curl -L git.io/scope -o /usr/local/bin/scope \
+  && chmod +x /usr/local/bin/scope
 
 WORKDIR /weave

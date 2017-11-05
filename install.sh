@@ -51,18 +51,8 @@ check_docker_version() {
     fi
 }
 
-check_docker_swarm() {
-    if ! DOCKER_SWARM_MODE=$(docker info | grep 'Swarm: active') \
-        || [ -z "DOCKER_SWARM_MODE" ]; then
-        echo "ERROR: Docker Swarm mode is not active" >&2
-        exit 1
-    fi
-
-}
-
 check_docker_access
 check_docker_version
-check_docker_swarm
 
 usage_and_die() {
     echo "Usage: install TOKEN"
@@ -72,6 +62,17 @@ usage_and_die() {
 [ $# -gt 0 ] || usage_and_die
 WEAVE_TOKEN=$1
 shift 1
+
+check_docker_swarm() {
+    if ! DOCKER_SWARM_MODE=$(docker info | grep 'Swarm: active') \
+        || [ -z "DOCKER_SWARM_MODE" ]; then
+        echo "Docker Swarm mode is not active, installing Weave Scope"
+        scope launch --service-token=${WEAVE_TOKEN}
+        exit 0
+    fi
+}
+
+check_docker_swarm
 
 TOKEN=${WEAVE_TOKEN} docker stack deploy -c docker-compose.yml weave
 
