@@ -15,3 +15,11 @@ docker run -it --rm \
     weaveworks/swarm-agents install <WEAVE-TOKEN>
 ```
 
+The installer will deploy Weave stack containing the following services:
+
+* Weave Scope
+* Prometheus (remote write to Weave Cloud)
+* Node Exporter
+* cAdvisor
+
+Running the installer on a Docker engine without swarm mode will lunch Weave Scope only.
