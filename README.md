@@ -2,11 +2,16 @@
 
 Weave Cloud agents for Docker Swarm instrumentation
 
+Prerequisites:
+
+* Minimum Docker version 17.09.0-ce or 17.06.2-ee-3
+* Docker Swarm cluster with one manager and a worker node
+
+Install:
+
 ```bash
 $ git clone https://github.com/weaveworks-experiments/swarm-agents
 $ cd swarm-agents
-$ TOKEN=<WEAVE-TOKEN> docker stack deploy \
-    -c docker-compose.yml \
-    weave
+$ ./install.sh <WEAVE-TOKEN>
 ```
 
