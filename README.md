@@ -7,11 +7,11 @@ Prerequisites:
 * Minimum Docker version 17.09.0-ce or 17.06.2-ee-3
 * Docker Swarm cluster with one manager and a worker node
 
-Install:
+Install the agents by running the following command on a Swarm manager:
 
 ```bash
-$ git clone https://github.com/weaveworks-experiments/swarm-agents
-$ cd swarm-agents
-$ ./install.sh <WEAVE-TOKEN>
+docker run -it --rm \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    weaveworks/swarm-agents install <WEAVE-TOKEN>
 ```
 
