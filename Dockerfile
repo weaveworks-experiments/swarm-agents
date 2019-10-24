@@ -4,7 +4,7 @@ MAINTAINER Weaveworks Inc <help@weave.works>
 LABEL works.weave.role=system
 
 ENV WEAVESCOPE_DOCKER_ARGS='--restart unless-stopped' \
-    SCRIPT_VERSION=latest_release
+    VERSION=latest_release
 
 COPY . /weave
 COPY install.sh /usr/local/bin/install
